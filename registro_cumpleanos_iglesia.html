@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de Cumpleaños - Iglesia</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f4fb; min-height: 100vh; padding: 2rem 1rem 4rem; color: #1a1a2e; }
+    .wrap { max-width: 640px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(127,119,221,0.10); padding: 2.5rem 2rem; }
+    .church-header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e8e6f9; }
+    .church-header .icon { font-size: 38px; margin-bottom: 8px; }
+    .church-header h1 { font-size: 24px; font-weight: 700; color: #3C3489; margin-bottom: 4px; }
+    .church-header p { font-size: 14px; color: #7b7a99; }
+    .section { margin-bottom: 1.75rem; }
+    .section-label { font-size: 12px; font-weight: 700; color: #7F77DD; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 14px; color: #555; margin-bottom: 5px; font-weight: 500; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 9px 13px; border: 1px solid #dddaf5;
+      border-radius: 8px; font-size: 15px; font-family: inherit;
+      background: #faf9ff; color: #1a1a2e; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: #7F77DD; box-shadow: 0 0 0 3px rgba(127,119,221,0.13);
+    }
+    .field textarea { min-height: 72px; resize: vertical; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .radio-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .radio-btn {
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      padding: 7px 16px; border: 1px solid #dddaf5; border-radius: 999px;
+      font-size: 14px; color: #666; transition: all 0.15s; user-select: none;
+      background: #faf9ff;
+    }
+    .radio-btn:hover { border-color: #7F77DD; color: #3C3489; }
+    .radio-btn.selected { border-color: #7F77DD; background: #EEEDFE; color: #3C3489; font-weight: 600; }
+    .color-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+    .color-btn {
+      width: 38px; height: 38px; border-radius: 50%; border: 2px solid transparent;
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; position: relative;
+    }
+    .color-btn::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(0,0,0,0.10); }
+    .color-btn.selected { box-shadow: 0 0 0 3px #7F77DD; transform: scale(1.15); }
+    .divider { height: 1px; background: #eeecfc; margin: 1.75rem 0; }
+    .submit-btn {
+      width: 100%; padding: 13px; background: #7F77DD; color: white;
+      border: none; border-radius: 10px; font-size: 16px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s, transform 0.1s;
+      font-family: inherit; margin-top: 8px;
+    }
+    .submit-btn:hover { background: #534AB7; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { background: #b0aee8; cursor: not-allowed; }
+    .success-card {
+      display: none; background: #e8f8f1; border: 1px solid #1D9E75;
+      border-radius: 14px; padding: 2.5rem 2rem; text-align: center;
+    }
+    .success-card .check { font-size: 52px; }
+    .success-card h2 { color: #085041; font-size: 20px; margin: 12px 0 6px; }
+    .success-card p { color: #0F6E56; font-size: 15px; }
+    .success-card button { margin-top: 20px; background: #0F6E56; }
+    .char-counter { font-size: 12px; color: #aaa; text-align: right; margin-top: 3px; }
+    .required { color: #E24B4A; }
+    .error-msg { color: #E24B4A; font-size: 13px; margin-top: 4px; display: none; }
+    @media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } .wrap { padding: 1.5rem 1rem; } }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="church-header">
+    <div class="icon">✝️👏🏻	</div>
+    <h1>Registro de Cumpleaños</h1>
+    <p>Queremos conocerte mejor y celebrar contigo</p>
+  </div>
+
+  <div id="form-area">
+    <form id="miFormulario" action="https://formspree.io/f/xjgqkqjw" method="POST">
+
+      <!-- Campo oculto para el asunto del correo -->
+      <input type="hidden" name="_subject" value="🎂 Nuevo registro de cumpleaños" />
+      <input type="hidden" name="color_favorito" id="hidden-color" value="" />
+
+      <!-- DATOS PERSONALES -->
+      <div class="section">
+        <div class="section-label">👤 Datos personales</div>
+        <div class="field">
+          <label for="nombre">Nombre completo <span class="required">*</span></label>
+          <input type="text" id="nombre" name="nombre_completo" placeholder="Ej. María González" required />
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="nacimiento">Fecha de nacimiento 🎂 <span class="required">*</span></label>
+            <input type="date" id="nacimiento" name="fecha_nacimiento" required />
+          </div>
+          <div class="field">
+            <label for="celular">Número de celular/WhatsApp</label>
+            <input type="tel" id="celular" name="celular" placeholder="+51 999 999 999" />
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="genero">Género</label>
+            <select id="genero" name="genero">
+              <option value="">Seleccionar...</option>
+              <option>Masculino</option>
+              <option>Femenino</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="estado">Estado civil</label>
+            <select id="estado" name="estado_civil">
+              <option value="">Seleccionar...</option>
+              <option>Soltero/a</option>
+              <option>Casado/a</option>
+              <option>Viudo/a</option>
+              <option>Divorciado/a</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- CARRERA Y VIDA -->
+      <div class="section">
+        <div class="section-label">💼 Carrera y vida</div>
+        <div class="row2">
+          <div class="field">
+            <label for="carrera">Carrera profesional u oficio</label>
+            <input type="text" id="carrera" name="carrera" placeholder="Ej. Ingeniería, Enfermería, Tec..." />
+          </div>
+          <div class="field">
+            <label for="tiempo">¿Cuánto tiempo llevas en la iglesia?</label>
+            <select id="tiempo" name="tiempo_en_iglesia">
+              <option value="">Seleccionar...</option>
+              <option>Menos de 1 año</option>
+              <option>1 a 3 años</option>
+              <option>3 a 5 años</option>
+              <option>Más de 5 años</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- FE Y PALABRA -->
+      <div class="section">
+        <div class="section-label">📖 Fe y Palabra</div>
+        <div class="field">
+          <label for="biblia">Texto bíblico favorito</label>
+          <textarea id="biblia" name="texto_biblico" placeholder="Escribe aquí tu versículo o pasaje favorito..."></textarea>
+          <div class="char-counter"><span id="biblia-count">0</span>/200 caracteres</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- GUSTOS CULINARIOS -->
+      <div class="section">
+        <div class="section-label">🍽️ Gustos culinarios</div>
+        <div class="field">
+          <label>Plato favorito — puedes escribir hasta 2 opciones</label>
+          <input type="text" name="plato_favorito_1" placeholder="Primera opción: Ej. Lomo saltado" style="margin-bottom:8px;" />
+          <input type="text" name="plato_favorito_2" placeholder="Segunda opción (opcional): Ej. Caldo de gallina" />
+        </div>
+        <div class="field">
+          <label>¿Tu bebida favorita es?</label>
+          <div class="radio-group" id="bebida-tipo">
+            <label class="radio-btn" onclick="selectRadio('bebida-tipo', this, 'bebida_tipo')">☕ Caliente</label>
+            <label class="radio-btn" onclick="selectRadio('bebida-tipo', this, 'bebida_tipo')">🧊 Fría</label>
+            <label class="radio-btn" onclick="selectRadio('bebida-tipo', this, 'bebida_tipo')">✨ Ambas</label>
+          </div>
+          <input type="hidden" name="bebida_tipo" id="bebida_tipo" value="" />
+        </div>
+        <div class="field">
+          <label for="bebida">¿Cuál es esa bebida favorita?</label>
+          <input type="text" id="bebida" name="bebida_favorita" placeholder="Ej. Café, chicha morada, limonada..." />
+        </div>
+        <div class="field">
+          <label for="alergia">¿Tienes alguna alergia o restricción alimentaria?</label>
+          <input type="text" id="alergia" name="alergia_restriccion" placeholder="Ej. Mariscos, gluten, lactosa, ninguna..." />
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- COLOR FAVORITO -->
+      <div class="section">
+        <div class="section-label">🎨 Color favorito</div>
+        <div class="color-grid" id="color-grid"></div>
+        <div class="field" style="margin-top:12px;">
+          <label for="otro-color">¿Otro color? (escribe aquí)</label>
+          <input type="text" id="otro-color" name="color_otro" placeholder="Ej. Celeste pastel, verde olivo..." />
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- GUSTOS Y HOBBIES -->
+      <div class="section">
+        <div class="section-label">❤️ Gustos y hobbies</div>
+        <div class="field">
+          <label for="gustos">¿Cuáles son tus pasatiempos o gustos personales?</label>
+          <textarea id="gustos" name="pasatiempos" placeholder="Ej. Leer, cantar, deportes, manualidades, cocinar..."></textarea>
+        </div>
+        <div class="field">
+          <label for="especial">¿Hay algo especial que quisieras compartir con la iglesia?</label>
+          <textarea id="especial" name="mensaje_especial" placeholder="Un sueño, una petición de oración, algo que te gusta hacer en comunidad..."></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="btn-submit">✉️ Enviar registro</button>
+    </form>
+  </div>
+
+  <!-- PANTALLA DE ÉXITO -->
+  <div class="success-card" id="success">
+    <div class="check">✅</div>
+    <h2>¡Registro enviado con éxito!</h2>
+    <p>¡Gracias por compartir! Oramos para que tu próximo cumpleaños sea lleno de bendiciones 🙏</p>
+    <button class="submit-btn" onclick="resetForm()">Registrar otra persona</button>
+  </div>
+</div>
+
+<script>
+  // Colores
+  const colores = [
+    {name:'Rojo', hex:'#E24B4A'}, {name:'Naranja', hex:'#EF9F27'},
+    {name:'Amarillo', hex:'#FAC775'}, {name:'Verde', hex:'#639922'},
+    {name:'Azul', hex:'#378ADD'}, {name:'Morado', hex:'#7F77DD'},
+    {name:'Rosado', hex:'#D4537E'}, {name:'Negro', hex:'#2C2C2A'},
+    {name:'Blanco', hex:'#E8E8E8'}, {name:'Celeste', hex:'#85B7EB'},
+    {name:'Turquesa', hex:'#1D9E75'}, {name:'Marrón', hex:'#854F0B'},
+  ];
+
+  const grid = document.getElementById('color-grid');
+  colores.forEach(c => {
+    const btn = document.createElement('div');
+    btn.className = 'color-btn';
+    btn.title = c.name;
+    btn.style.background = c.hex;
+    btn.onclick = () => {
+      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('hidden-color').value = c.name;
+    };
+    grid.appendChild(btn);
+  });
+
+  // Radio buttons visuales
+  function selectRadio(groupId, el, hiddenId) {
+    document.getElementById(groupId).querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    const texto = el.textContent.trim().replace(/^[^\w]+/, '').trim();
+    if (hiddenId) document.getElementById(hiddenId).value = el.textContent.trim();
+  }
+
+  // Contador texto bíblico
+  const bibliaTA = document.getElementById('biblia');
+  const bibliaCount = document.getElementById('biblia-count');
+  bibliaTA.addEventListener('input', () => {
+    if (bibliaTA.value.length > 200) bibliaTA.value = bibliaTA.value.slice(0, 200);
+    bibliaCount.textContent = bibliaTA.value.length;
+  });
+
+  // Envío con Formspree via fetch (sin redirección)
+  const form = document.getElementById('miFormulario');
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('nombre').value.trim();
+    const nacimiento = document.getElementById('nacimiento').value;
+    if (!nombre) { alert('Por favor ingresa el nombre completo.'); return; }
+    if (!nacimiento) { alert('Por favor ingresa la fecha de nacimiento.'); return; }
+
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.textContent = '⏳ Enviando...';
+
+    const data = new FormData(form);
+
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        document.getElementById('form-area').style.display = 'none';
+        document.getElementById('success').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert('Hubo un problema al enviar. Intenta de nuevo.');
+        btn.disabled = false;
+        btn.textContent = '✉️ Enviar registro';
+      }
+    } catch (err) {
+      alert('Error de conexión. Verifica tu internet e intenta de nuevo.');
+      btn.disabled = false;
+      btn.textContent = '✉️ Enviar registro';
+    }
+  });
+
+  // Reset
+  function resetForm() {
+    form.reset();
+    document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('hidden-color').value = '';
+    document.getElementById('bebida_tipo').value = '';
+    bibliaCount.textContent = '0';
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = false;
+    btn.textContent = '✉️ Enviar registro';
+    document.getElementById('form-area').style.display = 'block';
+    document.getElementById('success').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
